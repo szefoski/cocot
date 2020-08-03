@@ -33,6 +33,7 @@ function(print_target_properties tgt)
 endfunction(print_target_properties)
 
 include(FetchContent)
+include (ExternalProject)
 set(TheNew 1)
 
 SET(CMAKE_FIND_LIBRARY_SUFFIXES .lib .a)
@@ -40,19 +41,28 @@ SET(CMAKE_FIND_LIBRARY_SUFFIXES .lib .a)
 if(${TheNew})
 	#set(CMAKE_BUILD_TYPE "Release" CACHE STRING "type of build" FORCE)
 	set(FETCHCONTENT_QUIET OFF)
-	set(SDL_SHARED ON)
-	set(SDL_STATIC ON)
-	FetchContent_Declare(
-	  SDL2
-	  URL  https://zlib.net/zlib-1.2.11.tar.gz
-	)
-	FetchContent_MakeAvailable(SDL2)
+
+	
+ExternalProject_Add(SDL2     
+    URL  https://www.libsdl.org/release/SDL2-2.0.12.zip
+	INSTALL_DIR    ${CMAKE_CURRENT_BINARY_DIR}/ext/
+	INSTALL_COMMAND ""
+	BUILD_COMMAND     ${CMAKE_COMMAND} --build <BINARY_DIR> --config Debug
+ )
+	#ExternalProject_Get_Property(SDL2 install_dir)
+	#add_dependencies(CMakeDemo SDL2)
+	
+	ExternalProject_Get_Property(SDL2 SOURCE_DIR)
+	ExternalProject_Get_Property(SDL2 binary_dir)
+	
+	include_directories("${SOURCE_DIR}/include")
+	link_directories("${binary_dir}/Debug")
 	
 	#set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "type of build" FORCE)
 	# Define executable target
 	add_executable(CMakeDemo main.cpp)
 
-	target_link_libraries(CMakeDemo )
+	target_link_libraries(CMakeDemo SDL2-staticd winmm.lib imm32.lib version.lib Setupapi.lib)
 else()
 
 	set(CMAKE_SDL_PATH "${CMAKE_SOURCE_DIR}/extern/SDL2")
@@ -68,7 +78,7 @@ else()
 endif()
 
 message("******************************")
-#dump_cmake_variables()
+dump_cmake_variables()
 message("#################")
 print_target_properties(SDL2)
 
