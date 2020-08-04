@@ -4,5 +4,5 @@
 
 ### Proxy PowerShell
 ```
-$env:HTTPS_PROXY='http://<user>:<password>@dc1proxy01.hella.com:3128'
+$env:HTTPS_PROXY='http://<user>:<password>@<host>:port'
 ```
