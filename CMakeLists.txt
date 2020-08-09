@@ -32,7 +32,6 @@ function(print_target_properties tgt)
     endforeach(prop)
 endfunction(print_target_properties)
 
-include(FetchContent)
 include (ExternalProject)
 set(TheNew 1)
 
@@ -41,24 +40,23 @@ SET(CMAKE_FIND_LIBRARY_SUFFIXES .lib .a)
 if(${TheNew})
 	#set(CMAKE_BUILD_TYPE "Release" CACHE STRING "type of build" FORCE)
 	set(FETCHCONTENT_QUIET OFF)
-
 	
-ExternalProject_Add(SDL2     
-    URL  https://www.libsdl.org/release/SDL2-2.0.12.zip
-	INSTALL_DIR    ${CMAKE_CURRENT_BINARY_DIR}/ext/
-	INSTALL_COMMAND ""
-	BUILD_COMMAND     ${CMAKE_COMMAND} --build <BINARY_DIR> --config Debug
- )
-	#ExternalProject_Get_Property(SDL2 install_dir)
-	#add_dependencies(CMakeDemo SDL2)
+    set(sdl_build_dir ${CMAKE_SOURCE_DIR}/third/sdl/build)
+    file(MAKE_DIRECTORY ${sdl_build_dir})
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} ../
+        WORKING_DIRECTORY ${sdl_build_dir}
+    )
+    
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} --build .
+        WORKING_DIRECTORY ${sdl_build_dir}
+    
+    )	
 	
-	ExternalProject_Get_Property(SDL2 SOURCE_DIR)
-	ExternalProject_Get_Property(SDL2 binary_dir)
-	
-	include_directories("${SOURCE_DIR}/include")
+	include_directories("${sdl_build_dir}/SDL2-download-prefix/src/SDL2-download-build/include")
 	link_directories("${binary_dir}/Debug")
 	
-	#set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "type of build" FORCE)
 	# Define executable target
 	add_executable(CMakeDemo main.cpp)
 
@@ -77,9 +75,9 @@ else()
 
 endif()
 
-message("******************************")
-dump_cmake_variables()
-message("#################")
-print_target_properties(SDL2)
+# message("******************************")
+# dump_cmake_variables()
+# message("#################")
+# print_target_properties(SDL2)
 
 
